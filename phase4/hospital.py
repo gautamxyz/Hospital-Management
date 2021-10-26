@@ -766,28 +766,26 @@ def dispatch(ch):
     elif(ch == 16):
         AddDoctor()
     elif(ch == 17):
-        AddVisitingHours()
-    elif(ch == 18):
         AddNurse()
-    elif(ch == 19):
+    elif(ch == 18):
         AddLabTechnician()
-    elif(ch == 20):
+    elif(ch == 19):
         AddPatient()
-    elif(ch == 21):
+    elif(ch == 20):
         PatWithSameDisease()
-    elif(ch == 22):
+    elif(ch == 21):
         AvgSalary()
-    elif(ch == 23):
+    elif(ch == 22):
         PatWithSameMedicine()
-    elif(ch == 24):
+    elif(ch == 23):
         PatWithSameName()
-    elif(ch == 25):
+    elif(ch == 24):
         AvgStayOfDay()
-    elif(ch == 26):
+    elif(ch == 25):
         PatStayMoreThanAvg()
-    elif(ch == 27):
+    elif(ch == 26):
         DischargePatient()
-    elif(ch == 28):
+    elif(ch == 27):
         ListBedsAvailable()    
     else:
         print("Error: Invalid Option")
@@ -848,23 +846,22 @@ while(1):
                 print("14. Insert visitor")
                 print("15. Insert medical department")
                 print("16. Insert Doctor")
-                print("17. Insert visiting hours")
-                print("18. Insert nurse")
-                print("19. Insert Lab Technician")
-                print("20. Insert patient")
-                print("21. Show patients with same disease")
-                print("22. Show average salary of doctors")
-                print("23. Show patients that bought same medicine")
-                print("24. Show patients with same first name ")
-                print("25. Show average stay of patients")
-                print("26. Show patients that stayed more than average days")
-                print("27. Update discharge date of patient")
-                print("28. Show beds available")
-                print("29. Exit mysql")
+                print("17. Insert nurse")
+                print("18. Insert Lab Technician")
+                print("19. Insert patient")
+                print("20. Show patients with same disease")
+                print("21. Show average salary of doctors")
+                print("22. Show patients that bought same medicine")
+                print("23. Show patients with same first name ")
+                print("24. Show average stay of patients")
+                print("25. Show patients that stayed more than average days")
+                print("26. Update discharge date of patient")
+                print("27. Show beds available")
+                print("28. Exit mysql")
 
                 ch = int(input("Enter choice> "))
                 tmp = sp.call('clear', shell=True)
-                if ch == 30:
+                if ch == 28:
                     StoreVariables()
                     exit(0)
                 else:
