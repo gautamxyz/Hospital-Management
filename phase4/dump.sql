@@ -190,56 +190,8 @@ INSERT INTO `DIS_PAT` VALUES ('1','2'),('1','3'),('2','3'),('2','5'),('2','2'),(
 UNLOCK TABLES;
 
 --
--- Table structure for table `DOCTOR`
---
-
-DROP TABLE IF EXISTS `DOCTOR`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `DOCTOR` (
-  `FIRST_NAME` varchar(15) NOT NULL,
-  `MIDDLE_NAME` varchar(15) DEFAULT NULL,
-  `LAST_NAME` varchar(15) DEFAULT NULL,
-  `DOCTOR_ID` int NOT NULL,
-  `DOB` date NOT NULL,
-  `GENDER` char(1) NOT NULL,
-  `BLOOD_GROUP` varchar(3) NOT NULL,
-  `PHONE` varchar(10) NOT NULL, 
-  `EMAIL` varchar(100) NOT NULL, 
-  `HOUSE` varchar(255) NOT NULL,
-  `ZIP_CODE` int NOT NULL,
-  `QUALIFICATION` varchar(255) DEFAULT NULL,
-  `EXPERIENCE` int DEFAULT NULL,
-  `MED_DEPAR_ID` int NOT NULL ,
-  PRIMARY KEY (`DOCTOR_ID`),
-  UNIQUE KEY `PHONE` (`PHONE`),
-  UNIQUE KEY `EMAIL` (`EMAIL`),
-  FOREIGN KEY (`ZIP_CODE`) REFERENCES `ZIP_COUNTRY` (`ZIP_CODE`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `DOCTOR`
---
-
-LOCK TABLES `DOCTOR` WRITE;
-/*!40000 ALTER TABLE `DOCTOR` DISABLE KEYS */;
-INSERT INTO `DOCTOR` VALUES ('Virat',null,'KOHLI','1','2000-03-02','M','AB-','6969696969','vk@gmail.com','10 Downing-Street','110001','MBBS-AIIMS Delhi','10','4'),
- ('Mahendra','Singh','Dhoni','2','1900-03-02','M','AB-','6969694200','msd@gmail.com','1 Downing-Street','110001','MBBS-AIIMS Mumbai','20','1'),
- ('Anthony',null,'Fauci','3','1970-03-02','M','B-','6969694210','fauci@gmail.com','13 Bank Road','110071','IISC','30','2'),
- ('Neha',null,'Sharma','4','1980-06-02','F','A-','6969694221','neha@gmail.com','3 KG Road','110070','MBBS-Maulana Azad College, Delhi','7','1'),
- ('Rohit',null,'Sharma','5','1985-06-15','M','A+','9069694221','rohit@gmail.com','420 SP Marg','110060','MBBS-Maulana Azad College, Delhi','5','5'),
-('Shikhar',null,'Dhawan','6','1976-05-20','M','O+','9069694224','dhawan@gmail.com','69 SP Marg','110060','MBBS-Maulana Azad College, Delhi','6','3'),
- ('Babar',null,'Azam','7','1996-05-14','M','O-','9090909019','babarouton0@gmail.com','garreb gali pakistan','219898','College of Lahore',null,'4'),
- ('Narender','Damodas','Modi','8','1996-05-11','M','O-','9090909018','a@gmail.com','39 lamba marg','110001','College of kolkata',null,'1'),
- ('Anjana','OM','Kashyap','9','1996-05-10','F','O+','9090909017','b@gmail.com','420 shaitaan gali ','323232','College of mumbai',null,'2');
-/*!40000 ALTER TABLE `DOCTOR` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `MEDICAL_DEPARTMENT`
 --
-
 DROP TABLE IF EXISTS `MEDICAL_DEPARTMENT`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -261,6 +213,52 @@ LOCK TABLES `MEDICAL_DEPARTMENT` WRITE;
 /*!40000 ALTER TABLE `MEDICAL_DEPARTMENT` DISABLE KEYS */;
 INSERT INTO `MEDICAL_DEPARTMENT` VALUES ('1','2','Cardiologists','4'),('2','2','Dermatologists','6'),('3','1','Neurologists','1'),('4','3','Pathologists','3'),('5','4','Psychiatrists','4');
 /*!40000 ALTER TABLE `MEDICAL_DEPARTMENT` ENABLE KEYS */;
+UNLOCK TABLES;
+--
+-- Table structure for table `DOCTOR`
+--
+DROP TABLE IF EXISTS `DOCTOR`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `DOCTOR` (
+  `FIRST_NAME` varchar(15) NOT NULL,
+  `MIDDLE_NAME` varchar(15) DEFAULT NULL,
+  `LAST_NAME` varchar(15) DEFAULT NULL,
+  `DOCTOR_ID` int NOT NULL,
+  `DOB` date NOT NULL,
+  `GENDER` char(1) NOT NULL,
+  `BLOOD_GROUP` varchar(3) NOT NULL,
+  `PHONE` varchar(10) NOT NULL, 
+  `EMAIL` varchar(100) NOT NULL, 
+  `HOUSE` varchar(255) NOT NULL,
+  `ZIP_CODE` int NOT NULL,
+  `QUALIFICATION` varchar(255) DEFAULT NULL,
+  `EXPERIENCE` int DEFAULT NULL,
+  `MED_DEPAR_ID` int NOT NULL ,
+  PRIMARY KEY (`DOCTOR_ID`),
+  UNIQUE KEY `PHONE` (`PHONE`),
+  UNIQUE KEY `EMAIL` (`EMAIL`),
+  FOREIGN KEY (`ZIP_CODE`) REFERENCES `ZIP_COUNTRY` (`ZIP_CODE`),
+  CONSTRAINT `DOCTOR_MED_DEPAR_ibfk_1` FOREIGN KEY (`MED_DEPAR_ID`) REFERENCES `MEDICAL_DEPARTMENT` (`MED_DEPAR_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `DOCTOR`
+--
+
+LOCK TABLES `DOCTOR` WRITE;
+/*!40000 ALTER TABLE `DOCTOR` DISABLE KEYS */;
+INSERT INTO `DOCTOR` VALUES ('Virat',null,'KOHLI','1','2000-03-02','M','AB-','6969696969','vk@gmail.com','10 Downing-Street','110001','MBBS-AIIMS Delhi','10','4'),
+ ('Mahendra','Singh','Dhoni','2','1900-03-02','M','AB-','6969694200','msd@gmail.com','1 Downing-Street','110001','MBBS-AIIMS Mumbai','20','1'),
+ ('Anthony',null,'Fauci','3','1970-03-02','M','B-','6969694210','fauci@gmail.com','13 Bank Road','110071','IISC','30','2'),
+ ('Neha',null,'Sharma','4','1980-06-02','F','A-','6969694221','neha@gmail.com','3 KG Road','110070','MBBS-Maulana Azad College, Delhi','7','1'),
+ ('Rohit',null,'Sharma','5','1985-06-15','M','A+','9069694221','rohit@gmail.com','420 SP Marg','110060','MBBS-Maulana Azad College, Delhi','5','5'),
+('Shikhar',null,'Dhawan','6','1976-05-20','M','O+','9069694224','dhawan@gmail.com','69 SP Marg','110060','MBBS-Maulana Azad College, Delhi','6','3'),
+ ('Babar',null,'Azam','7','1996-05-14','M','O-','9090909019','babarouton0@gmail.com','garreb gali pakistan','219898','College of Lahore',null,'4'),
+ ('Narender','Damodas','Modi','8','1996-05-11','M','O-','9090909018','a@gmail.com','39 lamba marg','110001','College of kolkata',null,'1'),
+ ('Anjana','OM','Kashyap','9','1996-05-10','F','O+','9090909017','b@gmail.com','420 shaitaan gali ','323232','College of mumbai',null,'2');
+/*!40000 ALTER TABLE `DOCTOR` ENABLE KEYS */;
 UNLOCK TABLES;
 
 -- Table structure for `PERMANENT_SALARY`
@@ -306,8 +304,6 @@ INSERT INTO `PERMANENT` VALUES ('1','HOD'),('2','Specialist'),('3','Pupil'),('4'
 UNLOCK TABLES;
 
 -- 
-
-
 
 DROP TABLE IF EXISTS `TRAINEE`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -731,6 +727,20 @@ INSERT INTO `STAY` VALUES ('1','1','1'),('2','2','2'),('3','2','3');
 /*!40000 ALTER TABLE `STAY` ENABLE KEYS */;
 UNLOCK TABLES;
 
+DROP TABLE IF EXISTS `BEDS_OCCUPIED`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `BEDS_OCCUPIED` (
+  `BED_NUMBER` int NOT NULL,
+  `OCCUPIED` INT NOT NULL,
+  PRIMARY KEY (`BED_NUMBER`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+LOCK TABLES `BEDS_OCCUPIED` WRITE;
+/*!40000 ALTER TABLE `BEDS_OCCUPIED` DISABLE KEYS */;
+INSERT INTO `BEDS_OCCUPIED` VALUES ('1','1'),('2','1'),('3','1'),('4','0'),('5','1'),('6','0'),('7','0'),('8','0'),('9','0'),('10','0'),('11','0'),('12','0'),('13','0'),('14','0'),('15','0'),('16','0'),('17','0'),('18','0'),('19','0'),('20','0');
+/*!40000 ALTER TABLE `BEDS_OCCUPIED` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
