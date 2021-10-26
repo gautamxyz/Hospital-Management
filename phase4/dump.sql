@@ -741,7 +741,6 @@ LOCK TABLES `BEDS_OCCUPIED` WRITE;
 INSERT INTO `BEDS_OCCUPIED` VALUES ('1','1'),('2','1'),('3','1'),('4','0'),('5','1'),('6','0'),('7','0'),('8','0'),('9','0'),('10','0'),('11','0'),('12','0'),('13','0'),('14','0'),('15','0'),('16','0'),('17','0'),('18','0'),('19','0'),('20','0');
 /*!40000 ALTER TABLE `BEDS_OCCUPIED` ENABLE KEYS */;
 UNLOCK TABLES;
-
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
