@@ -491,11 +491,12 @@ def AddDriver():
         "BLOOD_GROUP [A-,A+,B+,B-,O+,O-,AB-,AB+] : ")
     row["PHONE"] = (input("PHONE: "))
     row["LICENSE_NUMBER"] = input("LICENSE_NUMBER : ")
+    row["INSURANCE_ID"]=input("INSURANCE ID : ")
     row["ZIP_CODE"] = int(input("ZIP_CODE : "))
     row["VEHICLE_NUMBER"] = input("VEHICLE NUMBER : ")
     row["HOUSE"] = input("HOUSE ADDRESS : ")
-    query = "INSERT INTO DRIVER(EMPLOYEE_ID,FIRST_NAME, MIDDLE_NAME, LAST_NAME,DOB,LICENSE_NUMBER,GENDER,INSURANCE_ID,BLOOD_GROUP,PHONE,HOUSE,ZIP_CODE,VEHICLE_NUMBER) VALUES('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' , '%d', '%s', '%s');" % (
-        row["EMPLOYEE_ID"], row["FIRST_NAME"], row["MIDDLE_NAME"], row["LAST_NAME"], row["DOB"], row["GENDER"], row["BLOOD_GROUP"], row["PHONE"], row["LICENSE_NUMBER"], row["ZIP_CODE"], row["VEHICLE_NUMBER"], row["HOUSE"])
+    query = "INSERT INTO DRIVER(EMPLOYEE_ID,FIRST_NAME, MIDDLE_NAME, LAST_NAME,DOB,LICENSE_NUMBER,GENDER,INSURANCE_ID,BLOOD_GROUP,PHONE,HOUSE,ZIP_CODE,VEHICLE_NUMBER) VALUES('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s','%s' , '%d', '%s', '%s');" % (
+        row["EMPLOYEE_ID"], row["FIRST_NAME"], row["MIDDLE_NAME"], row["LAST_NAME"], row["DOB"], row["LICENSE_NUMBER"],row["GENDER"],row["INSURANCE_ID"], row["BLOOD_GROUP"], row["PHONE"],row["HOUSE"],row["ZIP_CODE"],row["VEHICLE_NUMBER"])
     gender_count = gender_list.count(row["GENDER"])
     if gender_count == 0:
         print("Invalid Input for gender\nRecord Not added\nInvalid Input!!!\n")
@@ -543,7 +544,7 @@ def CurrentMedicalDept():
 
 
 def CurrentLabTests():
-    ExecuteQuery("SELECT TEST_DECRIPTION FROM TEST;")
+    ExecuteQuery("SELECT TEST_DESCRIPTION FROM TEST;")
 
 
 def UpdateDocSalary():
@@ -594,7 +595,7 @@ def GetDoctorFromDepartment():
 def CostOfLabTest():
     position = input(
         "Enter the medical department like RTPCR COVID TEST Rapid antigen test for covid, Test to check dengue and malaria, Blood test, Protient test ")
-    query = "SELECT COST FROM TEST WHERE TEST_DECRIPTION = '%s'" % (position)
+    query = "SELECT COST FROM TEST WHERE TEST_DESCRIPTION = '%s'" % (position)
     returnvalue = ExecuteQuery(query)
     if(returnvalue == 0):
         print("An error occured try again")
