@@ -2,6 +2,7 @@ from os import initgroups
 import subprocess as sp
 import pymysql
 import pymysql.cursors
+from datetime import date
 
 gender_list = ["M", "F", "O"]
 blood_group_list = ["A-", "A+", "B+", "B-", "O+", "O-", "AB-", "AB+"]
@@ -48,16 +49,14 @@ def InitBedsList():
         cur.execute(query)
         con.commit()
         room_list = cur.fetchall()
-        DisplayQuery(room_list)
-        for row in room_list:
-            rooms[int(row["BED_NUMBER"])] = int(row["OCCUPIED"])
+        for i in range(1,21):
+            rooms.insert(i, room_list[i-1]["OCCUPIED"])
             
     except Exception as e:
         con.rollback()
         print("Failed to retrieve rooms data")
         print(">>>>>>>>>>>>>", e)
-        exit(1)
-      
+        exit(1)  
 def DisplayQuery(fetched_results):
     if len(fetched_results) == 0:
         return 0
@@ -77,6 +76,7 @@ def ExecuteQuery(query):
         print(">>>>>>>>>>>>>", e)
         return 0
     return 1
+
 def AddEmergencyContact(query):
     global last_patient_added
     row = {}
@@ -94,8 +94,8 @@ def AddEmergencyContact(query):
     else:
         last_patient_added = last_patient_added - 1
     return
-def AddDiseasePatient(id):
-    patient_id = id
+def AddDiseasePatient():
+    patient_id = int(input("Enter Patient Id :"))
     disease_id = int(input("Enter Disease Id : "))
     query = "INSERT INTO DIS_PAT( PATIENT_ID ,DISEASE_ID)VALUES('%d','%d')" % (
         patient_id, disease_id)
@@ -107,21 +107,29 @@ def AddOutPatient(query, id):
     query += "INSERT INTO OUT_PATIENT(PATIENT_ID) VALUES('%d');" % (id
         )
     AddEmergencyContact(query) 
-
 def NumberOfBedsAvaialable():
     count = 0 
-    for i in range(0,len(rooms)):
+    for i in range(1,len(rooms)):
         if rooms[i] == 0:
             count = count + 1
     return count
-        
-
 def AddInPatient(query,id):
     beds = NumberOfBedsAvaialable()
     if beds == 0:
         print("No Beds available\npatient cant be admitted\n")
         return
-        
+    bed_allot = -1
+    for i in range(1,len(rooms)):
+        if rooms[i]==0:
+            bed_allot = i
+            rooms[i]=1
+            break
+    operation=input("Enter Operation : ")
+    date_of_arrival=date.today()
+    date_of_discharge=date_of_arrival
+    query += "INSERT INTO IN_PATIENT(PATIENT_ID,BED_NUMBER,OPERATION,DATE_OF_ARRIVAL,DATE_OF_DISCHARGE) VALUES('%d','%d','%s','%s','%s');" % (id,bed_allot,operation,date_of_arrival,date_of_discharge
+        )
+    AddEmergencyContact(query)           
 def AddPatient():
     row = {}
     global last_patient_added
@@ -158,8 +166,7 @@ def AddPatient():
     if patient_type == 1:
         AddOutPatient(query,row["PATIENT_ID"])
     else:
-        AddInPatient(query)
-
+        AddInPatient(query,row["PATIENT_ID"])
     return
 def AddLabTechnician():
     row = {}
@@ -415,39 +422,47 @@ def AddDriver():
     else :
         last_employee_added = last_employee_added - 1
 
+def DischargePatient():
+    patient_id = input("Enter Patient id")
+    date_of_discharge = date.today()
+    query = "UPDATE IN_PATIENT SET DATE_OF_DISCHARGE='%s' WHERE PATIENT_ID='%d'" %(date_of_discharge,patient_id)
+    ExecuteQuery(query)
+    query = "SELECT * FROM IN_PATIENT WHERE PATIENT_ID = '%d'" %(patient_id)
+    try:
+        print(query)
+        cur.execute(query)
+        con.commit()
+        result = cur.fetchall()
+        room_id = result[0]["BED_NUMBER"]
+        rooms[room_id] = 0
+    except Exception as e:
+        con.rollback()
+        print("Execute Discharge\n")
+        print(">>>>>>>>>>>>>", e)
+        return 0
+    return 1
 def CurrentDoctorsWorking():
     ExecuteQuery(
         "SELECT FIRST_NAME,LAST_NAME,NAME FROM DOCTOR INNER JOIN MEDICAL_DEPARTMENT AS MD ON DOCTOR.MED_DEPAR_ID = MD.MED_DEPAR_ID;")
 def CurrentMedicalDept():
     ExecuteQuery("SELECT MED_DEPAR_ID,NAME FROM MEDICAL_DEPARTMENT;")
-
 def CurrentLabTests():
     ExecuteQuery("SELECT TEST_DESCRIPTION FROM TEST")
-
-    
-def UpdateDocSalary():
-    
+def UpdateDocSalary():   
     position = (int(input("Enter doctor position: ")))
     salary = (int(input("Enter updated salary: "))) 
     query= "UPDATE PERMANENT_SALARY SET SALARY='%d' WHERE POSITION='%s'" %(salary,position)
     ExecuteQuery(query)
-
 def UpdateNurseSalary():
     exp = (int(input("Enter nurse's position: ")))
     salary = (int(input("Enter updated salary: ")))
     query = "UPDATE NURSE_SALARY SET SALARY='%d' WHERE EXPERIENCE='%d'" %(salary,exp)
     ExecuteQuery(query) 
-    
-    
-
 def UpdateOtherStaffSalary():
-    
     work=input("Enter work type: ")
     salary=(int(input("Enter updated Salary: ")))
     query = "UPDATE OTHER_STAFF_SALARY SET SALARY='%d' WHERE WORK='%s'" %(salary,work)
-    ExecuteQuery(query) 
-    
-    
+    ExecuteQuery(query)     
 def GetDoctorFromPosition():
     position=input("Enter the position like HOD, specialist, pupil,expert")
     query = "SELECT DOCTOR.FIRST_NAME, DOCTOR.MIDDLE_NAME,DOCTOR.LAST_NAME FROM DOCTOR INNER JOIN PERMANENT ON DOCTOR.DOCTOR_ID=PERMANENT.DOCTOR_ID WHERE PERMANENT.POSITION = '%s'" %(position)
@@ -455,7 +470,6 @@ def GetDoctorFromPosition():
     if(returnvalue == 0 ):
         print("An error occured try again")
     return
-
 def GetDoctorFromDepartment():
     position=input("Enter the medical department like Cardiologists, Dermatologists, Neurologists, Pathologists, Psychiatrists")
     query = "SELECT DOCTOR.FIRST_NAME, DOCTOR.MIDDLE_NAME,DOCTOR.LAST_NAME FROM DOCTOR INNER JOIN MEDICAL_DEPARTMENT ON DOCTOR.MED_DEPAR_ID=MEDICAL_DEPARTMENT.MED_DEPAR_ID WHERE MEDICAL_DEPARTMENT.NAME = '%s'" %(position)
@@ -463,36 +477,100 @@ def GetDoctorFromDepartment():
     if(returnvalue == 0 ):
         print("An error occured try again")
     return
-
 def CostOfLabTest():
-    position=input("Enter the medical department like RTPCR COVID TEST Rapid antigen test for covid, Test to check dengue and malaria, Blood test, Protient test")
+    position=input("Enter the medical department like RTPCR COVID TEST Rapid antigen test for covid, Test to check dengue and malaria, Blood test, Protient test ")
     query = "SELECT COST FROM TEST WHERE TEST_DECRIPTION = '%s'" %(position)
     returnvalue = ExecuteQuery(query) 
     if(returnvalue == 0 ):
         print("An error occured try again")
-    return
-    
+    return  
 def StockOfMedicine():
-    position=input("Enter the medicine name like Crocin Bitadine Paracetamol Aspirin Noradrenaline Firminho")
+    position=input("Enter the medicine name like Crocin Bitadine Paracetamol Aspirin Noradrenaline Firminho ")
     query = "SELECT STOCK FROM MEDICINE WHERE MEDICINE_NAME = '%s'" %(position)
     returnvalue = ExecuteQuery(query) 
     if(returnvalue == 0 ):
         print("An error occured try again")
     return
-
 def AvgStayOfDay():
     query = "SELECT AVG(DATEDIFF(DATE_OF_DISCHARGE,DATE_OF_ARRIVAL)) AS too_much_dna FROM IN_PATIENT"
     cur.execute(query)
     con.commit()
     A = cur.fetchall()
-    print("Average Stay Of Day : {}".A[0]["too_much_dna"])
-    return A[0]["too_much_dna"]
-    
+    print("Average Stay Of Day : ", A[0]["too_much_dna"])
+    return A[0]["too_much_dna"]  
 def PatStayMoreThanAvg():
     position = AvgStayOfDay()
     query = "SELECT PATIENT.FIRST_NAME, PATIENT.MIDDLE_NAME, PATIENT.LAST_NAME FROM PATIENT INNER JOIN IN_PATIENT ON PATIENT.PATIENT_ID=IN_PATIENT.PATIENT_ID WHERE DATEDIFF(IN_PATIENT.DATE_OF_DISCHARGE,IN_PATIENT.DATE_OF_ARRIVAL) > '%f' "%(position)
     ExecuteQuery(query)
+def PatWithSameName():
+    position = input("Enter first name to display common patient")
+    query = "SELECT * FROM PATIENT where FIRST_NAME  = '%s' "%(position)
+    ExecuteQuery(query)
+def GetMedicineID():
+    position = input("Enter Medicine name like Crocin Bitadine Paracetamol Aspirin Noradrenaline Firminho ")
+    query = "SELECT MEDICINE_ID FROM MEDICINE where MEDICINE_NAME  = '%s' "%(position)
+    cur.execute(query)
+    con.commit()
+    A = cur.fetchall()
+    print("Medicine Id associated : ", A[0]["MEDICINE_ID"])
+    return A[0]["MEDICINE_ID"]    
+def PatWithSameMedicine():
+    position = GetMedicineID()
+    query = "SELECT * FROM PATIENT INNER JOIN PRESCRIPTION ON PATIENT.PATIENT_ID = PRESCRIPTION.PATIENT_ID where MEDICINE_ID = '%d' "%(position)
+    ExecuteQuery(query)
+def AvgSalary():
+    query= "SELECT * FROM PERMANENT_SALARY;"
+    position={}
+    try:
+        cur.execute(query)
+        con.commit()
+        salary = cur.fetchall()
+        for items in salary:
+            position[items["POSITION"]] = int(items["SALARY"])
+    except Exception as e:
+        con.rollback()
+        print("Failed to insert into database")
+        print(">>>>>>>>>>>>>", e)
+        return 0
 
+    num_permanent = 0
+    avg_amount = 0
+    try:
+        query = "SELECT POSITION FROM PERMANENT"
+        cur.execute(query)
+        con.commit()
+        permanent = cur.fetchall()
+        for items in permanent:
+            avg_amount = avg_amount + position[items["POSITION"]]
+            num_permanent = num_permanent + 1
+        
+        if num_permanent != 0:
+            avg_amount = avg_amount / num_permanent
+            print("Average Doctor's Salary is : ",avg_amount)
+         
+    except Exception as e:
+        con.rollback()
+        print("Failed to insert into database")
+        print(">>>>>>>>>>>>>", e)
+        return 0
+    return 1
+def PatWithSameDisease():
+    query = "SELECT * FROM DISEASE;"
+    ExecuteQuery(query)
+    disease_id = int(input("Enter Disease Id:"))
+    query= "SELECT COUNT(*) AS COUNT_ANS FROM DIS_PAT WHERE DISEASE_ID = '%d'" % (disease_id)
+    try:
+        cur.execute(query)
+        con.commit()
+        ans = cur.fetchall()
+        print("Patient with disease ", disease_id, " are ",ans[0]["COUNT_ANS"])
+    except Exception as e:
+        con.rollback()
+        print("Execute Discharge\n")
+        print(">>>>>>>>>>>>>", e)
+        return 0
+    return 1
+   
 def dispatch(ch):
 
     """
@@ -500,12 +578,11 @@ def dispatch(ch):
     """
 
     if(ch == 1):
-        InitBedsList()
-        NumberOfBedsAvaialable();
+        PatWithSameDisease()
     elif(ch == 2):
         PatStayMoreThanAvg()
     elif(ch == 3):
-        option3()
+        PatWithSameMedicine()
     elif(ch == 4):
         option4()
     else:
@@ -575,19 +652,24 @@ while(1):
                 print("14. Insert visitor")
                 print("15. Insert medical department")
                 print("16. Insert Doctor")
-                print("17. Insert Permanent doctor")
-                print("18. Insert trainee doctor")
                 print("19. Insert visiting hours")
                 print("20. Insert nurse")
                 print("21. Insert Lab Technician")
                 print("22. Insert patient")
-                print("23. Insert inpatient")
-                print("24. Insert outpatient")
-                print("25. Show number of beds available")
-                print("26. ")
+                print("23. Show number of beds available")
+                print("24. Show patients with same disease")
+                print("25. Show average salary of doctors")
+                print("26. Patirnts that bought same medicine")
+                print("27. Show patients with same first name ")
+                print("28. Show average stay of patients")
+                print("29. Show patients that stayed more than average days")
+                print("30. Update discharge date of patient")
+                print("31. Add emergency contact")
+                print("32. Exit mysql")
+                
                 ch = int(input("Enter choice> "))
                 tmp = sp.call('clear', shell=True)
-                if ch == 25:
+                if ch == 32:
                     exit()
                 else:
                     dispatch(ch)
