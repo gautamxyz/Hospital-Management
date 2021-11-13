@@ -78,7 +78,7 @@ def StoreVariables():
     global last_nurse_added
     global last_labtech_added
     global last_employee_added
-    query = "UPDATE GLOBAL_VARIABLES SET LAST_PATIENT_ADDED = '%d' LAST_MEDICAL_DEPT_ADDED ='%d' LAST_DOCTOR_ADDED = '%d' LAST_NURSE_ADDED ='%d' LAST_LAB_TECH_ADDED='%d' LAST_EMPLOYEE_ADDED = '%d'" % (
+    query = "UPDATE GLOBAL_VARIABLES SET LAST_PATIENT_ADDED = '%d' LAST_MEDICAL_DEPT_ADDED ='%d'  LAST_DOCTOR_ADDED = '%d'   LAST_NURSE_ADDED ='%d'  LAST_LAB_TECH_ADDED='%d'  LAST_EMPLOYEE_ADDED = '%d'" % (
         last_patient_added, last_medical_dept_added, last_doctor_added, last_nurse_added, last_labtech_added, last_employee_added)
     try:
         cur.execute(query)
@@ -162,7 +162,7 @@ def AddEmergencyContact(query,id):
     row["REL_WITH_PATIENT"] = input("RELATION WITH THE PATIENT: ")
     row["PATIENT_ID"] = id
     row["PHONE"] = input("PHONE : ")
-    query += "INSERT INTO EMERGENCY_CONTACT( CONTACT_NAME ,REL_WITH_PATIENT,PATIENT_ID,PHONE) VALUES('%s', '%s','%d','%s');" % (
+    query += "INSERT INTO EMERGENCY_CONTACT(NAME ,REL_WITH_PATIENT,PATIENT_ID,PHONE) VALUES('%s', '%s','%d','%s');" % (
         row["VISITOR_NAME"], row["REL_WITH_PATIENT"], row["PATIENT_ID"], row["PHONE"])
 
     flag = ExecuteQuery(query)
@@ -186,19 +186,27 @@ def AddDiseasePatient():
 
 def AddOutPatient(query, id):
     query += "INSERT INTO OUT_PATIENT(PATIENT_ID) VALUES('%d');" % (id
-                                                                    )
-    AddEmergencyContact(query,id)
+                                    )
+    flag = ExecuteQuery(query)
+    if flag == 1:
+        print("Inserted Into Database")
+    else:
+        last_patient_added = last_patient_added - 1
+    return
+    #AddEmergencyContact(query,id)
 
 def NumberOfBedsAvaialable():
     count = 0
+    #print( "hello")
     for i in range(1, 21):
         if rooms[i] == 0:
             count = count + 1
     return count
 
-
 def AddInPatient(query, id):
+   # print("I Am here ok")
     beds = NumberOfBedsAvaialable()
+    print("Number of beds are : " , beds)
     if beds == 0:
         print("No Beds available\npatient cant be admitted\n")
         return
@@ -214,6 +222,7 @@ def AddInPatient(query, id):
     query += "INSERT INTO IN_PATIENT(PATIENT_ID,BED_NUMBER,OPERATION,DATE_OF_ARRIVAL,DATE_OF_DISCHARGE) VALUES('%d','%d','%s','%s','%s');" % (id, bed_allot, operation, date_of_arrival, date_of_discharge
                                                                                                                                               )
     AddEmergencyContact(query,id)
+    
 
 
 def AddPatient():
@@ -235,8 +244,8 @@ def AddPatient():
     if(patient_type != 0 and patient_type != 1):
         print("Invalid Patient Type \n")
         return
-    query = "INSERT INTO PATIENT(FIRST_NAME, MIDDLE_NAME, LAST_NAME,DOB, GENDER, BLOOD_GROUP,PHONE) VALUES('%s', '%s', '%s', '%s' , '%s', '%s', '%s');" % (
-        row["FIRST_NAME"], row["MIDDLE_NAME"], row["LAST_NAME"], row["DOB"], row["GENDER"], row["BLOOD_GROUP"], row["PHONE"])
+    query = "INSERT INTO PATIENT(PATIENT_ID,FIRST_NAME, MIDDLE_NAME, LAST_NAME,DOB, GENDER, BLOOD_GROUP,PHONE) VALUES('%d','%s', '%s', '%s', '%s' , '%s', '%s', '%s');" % (
+      row["PATIENT_ID"],  row["FIRST_NAME"], row["MIDDLE_NAME"], row["LAST_NAME"], row["DOB"], row["GENDER"], row["BLOOD_GROUP"], row["PHONE"])
 
     gender_count = gender_list.count(row["GENDER"])
 
@@ -265,22 +274,22 @@ def AddLabTechnician():
     row["MIDDLE_NAME"] = name[1]
     row["LAST_NAME"] = name[2]
     row["LAB_TECH_ID"] = last_labtech_added+1
-    last_nurse_added = last_labtech_added+1
+    last_labtech_added = last_labtech_added+1
     row["DOB"] = input("DATE OF BIRTH (YYYY-MM-DD): ")
     row["GENDER"] = input("GENDER(M/F/O): ")
     row["BLOOD_GROUP"] = input(
         "BLOOD_GROUP [A-,A+,B+,B-,O+,O-,AB-,AB+] : ")
     row["PHONE"] = (input("PHONE: "))
     #row["EMAIL"] = input("EMAIL : ")
-    row["ZIP_CODE"] = int(input("ZIP_CODE : "))
-    row["HOUSE"] = input("HOME ADDRESS : ")
-    row["QUALIFICATION"] = int(input("QUALIFICATION : "))
+    #row["ZIP_CODE"] = int(input("ZIP_CODE : "))
+    #row["HOUSE"] = input("HOME ADDRESS : ")
+    row["QUALIFICATION"] = (input("QUALIFICATION : "))
     row["EXPERIENCE"] = int(input("EXPERIENCE (in years) : "))
     row["LAB_DEPAR_ID"] = int(input(
         "LAB DEPARTMENT ID (\n1 - Covid Testing lab\n2 - Ultrasound\n3 - X-RAY\n4 - General Purpose testing\n5 - MRI\nenter option value : "))
 
-    query = "INSERT INTO NURSES(FIRST_NAME, MIDDLE_NAME, LAST_NAME, NURSE_ID, DOB,GENDER,BLOOD_GROUP,PHONE,HOUSE,ZIP_CODE,QUALIFICATION,EXPERIENCE) VALUES('%s', '%s', '%s', '%d', '%s', '%s', '%s', %s, %s , %s, %d. %s,%d,%d)" % (
-        row["FIRST_NAME"], row["MIDDLE_NAME"], row["LAST_NAME"], row["LAB_TECH_ID"], row["DOB"], row["GENDER"], row["BLOOD_GROUP"], row["PHONE"], row["HOUSE"], row["ZIP_CODE"], row["QUALIFICATION"], row["EXPERIENCE"], row["LAB_DEPAR_ID"])
+    query = "INSERT INTO LAB_TECHNICIAN(EMPLOYEE_ID,FIRST_NAME, MIDDLE_NAME, LAST_NAME,  DOB,GENDER,BLOOD_GROUP,PHONE,QUALIFICATION,EXPERIENCE,LAB_DEPAR_ID) VALUES('%d', '%s', '%s', '%s', '%s', '%c', '%s', '%s', '%s' , '%d', '%d' )" % (row["LAB_TECH_ID"],
+        row["FIRST_NAME"], row["MIDDLE_NAME"], row["LAST_NAME"], row["DOB"], row["GENDER"], row["BLOOD_GROUP"], row["PHONE"], row["QUALIFICATION"], row["EXPERIENCE"], row["LAB_DEPAR_ID"])
 
     gender_count = gender_list.count(row["GENDER"])
 
@@ -325,7 +334,7 @@ def AddNurse():
     #row["EMAIL"] = input("EMAIL : ")
     row["ZIP_CODE"] = int(input("ZIP_CODE : "))
     row["HOUSE"] = input("HOME ADDRESS : ")
-    row["QUALIFICATION"] = int(input("QUALIFICATION : "))
+    row["QUALIFICATION"] = input("QUALIFICATION : ")
     row["EXPERIENCE"] = int(input("EXPERIENCE (in years) : "))
     #row["MED_DEPAR_ID"] = int(input("MEDICAL DEPARTMENT ID (\n1 - Cardiologists\n2 - Dermatologists\n3 - Neurologists\n4 - Pathologists\n5 - Psychiatrists\nenter option value : "))
 
@@ -495,7 +504,7 @@ def AddDriver():
     row["ZIP_CODE"] = int(input("ZIP_CODE : "))
     row["VEHICLE_NUMBER"] = input("VEHICLE NUMBER : ")
     row["HOUSE"] = input("HOUSE ADDRESS : ")
-    query = "INSERT INTO DRIVER(EMPLOYEE_ID,FIRST_NAME, MIDDLE_NAME, LAST_NAME,DOB,LICENSE_NUMBER,GENDER,INSURANCE_ID,BLOOD_GROUP,PHONE,HOUSE,ZIP_CODE,VEHICLE_NUMBER) VALUES('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s','%s' , '%d', '%s', '%s');" % (
+    query = "INSERT INTO DRIVER(EMPLOYEE_ID,FIRST_NAME, MIDDLE_NAME, LAST_NAME,DOB,LICENSE_NUMBER,GENDER,INSURANCE_ID,BLOOD_GROUP,PHONE,HOUSE,ZIP_CODE,VEHICLE_NUMBER) VALUES('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s','%s' , '%s', '%d', '%s');" % (
         row["EMPLOYEE_ID"], row["FIRST_NAME"], row["MIDDLE_NAME"], row["LAST_NAME"], row["DOB"], row["LICENSE_NUMBER"],row["GENDER"],row["INSURANCE_ID"], row["BLOOD_GROUP"], row["PHONE"],row["HOUSE"],row["ZIP_CODE"],row["VEHICLE_NUMBER"])
     gender_count = gender_list.count(row["GENDER"])
     if gender_count == 0:
@@ -806,7 +815,7 @@ while(1):
         con = pymysql.connect(host='localhost',
                               port=30306,
                               user="root",
-                              password="MERASQL",
+                              password="password",
                               db='KAG-HOSPITAL',
                               cursorclass=pymysql.cursors.DictCursor,
                               client_flag = CLIENT.MULTI_STATEMENTS
@@ -827,6 +836,7 @@ while(1):
                 if flag_check == 0:
                     InitBedsList()
                     InitVariables()
+                    print("Variables done")
                     flag_check = 1
                 tmp = sp.call('clear', shell=True)
                 # Here taking example of Employee Mini-world
